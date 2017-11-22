@@ -37,7 +37,7 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
-if [[ -n `which percol` && ! -n $TMUX && $- == *l* ]]; then
+if [[ -x `which percol` && ! -n $TMUX && $- == *l* ]]; then
         # get the IDs
         sessions="`tmux list-sessions 2>/dev/null`"
         if [[ -n $sessions ]]; then
