@@ -5,11 +5,14 @@ if has("syntax")
 endif
 
 set showcmd		" Show (partial) command in status line.
-set showmatch		" Show matching brackets.
+set showmatch	" Show matching brackets.
 
 set number
 set cursorline
 set smartindent
+
+set tabstop=4
+set shiftwidth=4
 
 set hlsearch
 
@@ -36,6 +39,8 @@ inoremap <Up> <Nop>
 inoremap <Down> <Nop>
 inoremap <Left> <Nop>
 inoremap <Right> <Nop>
+
+highlight Comment ctermfg=Green
 
 if &term =~ "xterm"
     let &t_ti .= "\e[?2004h"
@@ -119,4 +124,3 @@ if has("cscope")
   set csverb
   set cscopequickfix=s-,c-,d-,i-,t-,e-
 endif
-
