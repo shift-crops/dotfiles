@@ -37,28 +37,8 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
-if [[ -x `which percol` && ! -n $TMUX && $- == *l* ]]; then
-        # get the IDs
-        sessions="`tmux list-sessions 2>/dev/null`"
-        if [[ -n $sessions ]]; then
-                sessions="${sessions}\n"
-        fi
-
-        create_new_session="Create New Session"
-        default="Default"
-        ID="${sessions}${create_new_session}\n${default}"
-        ID="`echo $ID | percol | cut -d: -f1`"
-
-        if [[ $ID = ${default} ]]; then
-                :
-        elif [[ $ID = ${create_new_session} ]]; then
-                tmux new-session && exit
-        elif [[ -n $ID ]]; then
-                tmux attach-session -t $ID && exit
-        else
-                :
-        fi
-fi
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.zshrc.tmux ] && source ~/.zshrc.tmux
 
 if [ -x /usr/bin/dircolors ]; then
 	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"

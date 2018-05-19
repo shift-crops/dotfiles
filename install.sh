@@ -1,9 +1,14 @@
 #!/bin/sh
 
-for dotfile in .?*
+for DIR in *
 do
-    if [ $dotfile != '..' ] && [ $dotfile != '.git' ]
-    then
-        ln -Fis "$PWD/$dotfile" $HOME
+    if [ ! -d $DIR ]; then
+	    continue
     fi
+
+    [ -f $DIR/setup.sh ] && $DIR/setup.sh
+    for FILE in $DIR/.??*
+    do
+        ln -Fis "$PWD/$FILE" $HOME
+    done
 done
