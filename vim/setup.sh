@@ -1,5 +1,9 @@
 #! /bin/sh
 
+if [ ! `which vim` ]; then
+	sudo apt install vim
+fi
+
 if [ ! -d ~/.vim/dein ]; then
     mkdir -p ~/.vim/dein
 
@@ -7,4 +11,3 @@ if [ ! -d ~/.vim/dein ]; then
     sh installer.sh ~/.vim/dein
     rm installer.sh
 fi
-

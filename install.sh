@@ -6,9 +6,16 @@ do
 	    continue
     fi
 
-    [ -f $DIR/setup.sh ] && $DIR/setup.sh
+    [ -x $DIR/setup.sh ] && $DIR/setup.sh
     for FILE in $DIR/.??*
     do
         ln -Fis "$PWD/$FILE" $HOME
     done
+done
+
+for FILE in others/*.sh
+do
+    if [ -x $FILE ]; then
+        $FILE
+    fi
 done
