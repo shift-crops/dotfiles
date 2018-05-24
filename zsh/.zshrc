@@ -37,11 +37,12 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-[ -f ~/.zshrc.tmux ] && source ~/.zshrc.tmux
-[ -f ~/.powerline.zsh ] && source ~/.powerline.zsh
-
 if [ -x /usr/bin/dircolors ]; then
 	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 	alias ls='ls --color=auto'
 fi
+
+[ -s ~/.powerline.zsh ] && source ~/.powerline.zsh
+[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] &&  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+[ -s ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux

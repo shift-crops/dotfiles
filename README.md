@@ -1,5 +1,4 @@
 # dotfiles
-=====
 
 zsh, tmux, vim, fzf
 
@@ -11,5 +10,5 @@ $ cd ~/dotfiles && ./install.sh
 ```
 
 ## Dependencies
-[dein.vim](https://github.com/Shougo/dein.vim)
+[dein.vim](https://github.com/Shougo/dein.vim)  
 [fzf](https://github.com/junegunn/fzf.git)  
