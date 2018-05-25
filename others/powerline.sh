@@ -9,11 +9,15 @@ if [ ! -f "$HOME/.config/fontconfig/conf.d/10-powerline-symbols.conf" ]; then
     wget https://github.com/powerline/powerline/raw/develop/font/10-powerline-symbols.conf -P ~/.config/fontconfig/conf.d
 fi
 
-if [ ! `which powerline` ]; then
-	sudo pip install powerline-status
+if [ ! `which pip3` ]; then
+	sudo apt install python3-pip
+fi
 
-	POWERLINE_ROOT=`pip show powerline-status | grep Location | awk '{print $2}'`
+if [ ! `which powerline` ]; then
+	sudo pip3 install powerline-status
+
+	POWERLINE_ROOT=`pip3 show powerline-status | grep Location | awk '{print $2}'`
 	ln -Fis $POWERLINE_ROOT/powerline/bindings/tmux/powerline.conf ~/.powerline.tmux.conf
 	ln -Fis $POWERLINE_ROOT/powerline/bindings/zsh/powerline.zsh ~/.powerline.zsh
-	cp -r $POWERLINE_ROOT/powerline/config_files .config/powerline
+	cp -r $POWERLINE_ROOT/powerline/config_files ~/.config/powerline
 fi
