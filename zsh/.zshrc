@@ -1,13 +1,4 @@
-# Set up the prompt
-
-autoload -Uz promptinit
-promptinit
-prompt adam1
-
 setopt histignorealldups sharehistory
-
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
@@ -42,7 +33,24 @@ if [ -x /usr/bin/dircolors ]; then
 	alias ls='ls --color=auto'
 fi
 
+# Set up the prompt
 [ -s ~/.powerline.zsh ] && source ~/.powerline.zsh
 [ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] &&  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+autoload -Uz promptinit
+promptinit
+prompt powerline
+
+# vi mode
+bindkey -v
+function zle-line-init zle-keymap-select {
+    VIM_NORMAL="%K{208}%F{black}⮀%k%f%K{208}%F{white} % NORMAL %k%f%K{black}%F{208}⮀%k%f"
+    VIM_INSERT="%K{075}%F{black}⮀%k%f%K{075}%F{white} % INSERT %k%f%K{black}%F{075}⮀%k%f"
+    RPS1="${${KEYMAP/vicmd/$VIM_NORMAL}/(main|viins)/$VIM_INSERT}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
 [ -s ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux
