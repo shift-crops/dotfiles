@@ -29,6 +29,8 @@ if has('persistent_undo')
 	set undofile
 endif
 
+noremap <C-j> <esc>
+noremap! <C-j> <esc>
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Left> <Nop>

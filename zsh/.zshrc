@@ -42,16 +42,30 @@ prompt powerline
 
 # vi mode
 bindkey -v
+bindkey '^j' vi-cmd-mode
 function zle-line-init zle-keymap-select {
 	if [ -n "$TMUX" ]; then
-		VIM_NORMAL="#[fg=white,bg=red]NORMAL#[fg=red,bg=black]"
-		VIM_INSERT="#[fg=black,bg=white]INSERT#[fg=white,bg=black]"
+		VIM_NORMAL="#{?client_prefix,#[bg=colour31],#[bg=red]}#[fg=colour255,bold] NORMAL "
+		VIM_NORMAL+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=red]}#[bg=black]"
+		VIM_INSERT="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=black]#[bg=colour255]}#[bold] INSERT "
+		VIM_INSERT+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=black]"
 		VIM_MODE="${${KEYMAP/vicmd/$VIM_NORMAL}/(main|viins)/$VIM_INSERT}"
-		tmux set-option status-left $VIM_MODE
+
+		tmux set-option status-left "$VIM_MODE#[default] "
 	fi
 }
 zle -N zle-line-init
 zle -N zle-keymap-select
+
+function zle-line-finish {
+	if [ -n "$TMUX" ]; then
+		STATUS="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=black]#[bg=colour255]}#[bold] #S "
+		STATUS+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=black]"
+
+		tmux set-option status-left "$STATUS#[default] "
+	fi
+}
+zle -N zle-line-finish
 
 [ -s ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux
