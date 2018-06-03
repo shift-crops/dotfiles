@@ -11,3 +11,7 @@ if [ ! -d ~/.vim/dein ]; then
     sh installer.sh ~/.vim/dein
     rm installer.sh
 fi
+
+if [ ! -d ~/.vim/undo ]; then
+    mkdir -p ~/.vim/undo
+fi

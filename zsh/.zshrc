@@ -38,7 +38,7 @@ fi
 [ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] &&  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 autoload -Uz promptinit
 promptinit
-prompt powerline
+prompt adam1
 
 # vi mode
 bindkey -v
@@ -46,9 +46,9 @@ bindkey '^j' vi-cmd-mode
 function zle-line-init zle-keymap-select {
 	if [ -n "$TMUX" ]; then
 		VIM_NORMAL="#{?client_prefix,#[bg=colour31],#[bg=red]}#[fg=colour255,bold] NORMAL "
-		VIM_NORMAL+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=red]}#[bg=black]"
-		VIM_INSERT="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=black]#[bg=colour255]}#[bold] INSERT "
-		VIM_INSERT+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=black]"
+		VIM_NORMAL+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=red]}#[bg=colour232]"
+		VIM_INSERT="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=colour232]#[bg=colour255]}#[bold] INSERT "
+		VIM_INSERT+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=colour232]"
 		VIM_MODE="${${KEYMAP/vicmd/$VIM_NORMAL}/(main|viins)/$VIM_INSERT}"
 
 		tmux set-option status-left "$VIM_MODE#[default] "
@@ -59,8 +59,8 @@ zle -N zle-keymap-select
 
 function zle-line-finish {
 	if [ -n "$TMUX" ]; then
-		STATUS="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=black]#[bg=colour255]}#[bold] #S "
-		STATUS+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=black]"
+		STATUS="#{?client_prefix,#[fg=colour255]#[bg=colour31],#[fg=colour232]#[bg=colour255]}#[bold] #S "
+		STATUS+="#{?client_prefix,#[fg=colour31],#[nobold]#[fg=colour255]}#[bg=colour232]"
 
 		tmux set-option status-left "$STATUS#[default] "
 	fi
