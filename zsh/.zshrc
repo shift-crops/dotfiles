@@ -1,4 +1,5 @@
 setopt histignorealldups sharehistory
+setopt IGNOREEOF
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
@@ -42,7 +43,8 @@ prompt adam1
 
 # vi mode
 bindkey -v
-bindkey '^j' vi-cmd-mode
+bindkey -M viins '^j' vi-cmd-mode
+bindkey -M vicmd -r '^j'
 function zle-line-init zle-keymap-select {
 	if [ -n "$TMUX" ]; then
 		VIM_NORMAL="#{?client_prefix,#[bg=colour31],#[bg=red]}#[fg=colour255,bold] NORMAL "
