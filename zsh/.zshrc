@@ -39,7 +39,7 @@ fi
 [ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] &&  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 autoload -Uz promptinit
 promptinit
-prompt adam1
+prompt powerline
 
 # vi mode
 bindkey -v
@@ -71,3 +71,4 @@ zle -N zle-line-finish
 
 [ -s ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux
+[ -s ~/.zshrc.local ] && source ~/.zshrc.local
