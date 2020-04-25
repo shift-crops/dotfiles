@@ -31,6 +31,8 @@ endif
 
 noremap <C-j> <esc>
 noremap! <C-j> <esc>
+noremap <Tab> gt
+noremap <S-Tab> gT
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Left> <Nop>
