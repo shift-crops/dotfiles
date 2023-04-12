@@ -11,6 +11,7 @@ set number
 set cursorline
 set smartindent
 
+filetype indent plugin on
 set tabstop=4
 set shiftwidth=4
 
@@ -66,48 +67,9 @@ if filereadable("/etc/vim/vimrc.local")
 endif
 
 "dein Scripts-----------------------------
-if &compatible
-  set nocompatible               " Be iMproved
+if filereadable(expand('~/.vimrc.dein'))
+  source ~/.vimrc.dein
 endif
-
-" Required:
-set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
-
-" Required:
-if dein#load_state('~/.vim/dein')
-  call dein#begin('~/.vim/dein')
-
-  " Let dein manage dein
-  " Required:
-  call dein#add('~/.vim/dein/repos/github.com/Shougo/dein.vim')
-
-  " Add or remove your plugins here:
-  call dein#add('Shougo/neosnippet.vim')
-  call dein#add('Shougo/neosnippet-snippets')
-  " call dein#add('The-NERD-tree')
-  " call dein#add('taglist.vim')
-  " call dein#add('https://github.com/wesleyche/SrcExpl.git')
-  " call dein#add('https://github.com/wesleyche/Trinity.git')
-  call dein#add('cohama/lexima.vim')
-  call dein#add('tpope/vim-surround')
-
-  " You can specify revision/branch/tag.
-  call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
-
-  " Required:
-  call dein#end()
-  call dein#save_state()
-endif
-
-" Required:
-filetype plugin indent on
-syntax enable
-
-" If you want to install not installed plugins on startup.
-"if dein#check_install()
-"  call dein#install()
-"endif
-
 "End dein Scripts-------------------------
 
 " ctags

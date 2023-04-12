@@ -7,7 +7,7 @@ fi
 if [ ! -d ~/.vim/dein ]; then
     mkdir -p ~/.vim/dein
 
-    wget https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh
+    wget https://raw.githubusercontent.com/Shougo/dein-installer.vim/main/installer.sh
     sh installer.sh ~/.vim/dein
     rm installer.sh
 fi
