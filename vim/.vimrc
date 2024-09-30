@@ -17,12 +17,14 @@ set shiftwidth=4
 
 set hlsearch
 
-set clipboard=unnamedplus,autoselect
+if has("clipboard")
+    set clipboard^=unnamedplus,autoselect
+endif
 
-if has ("mouse")
+if has("mouse")
 	set mouse=a
 	set guioptions+=a
-	set ttymouse=xterm2
+	" set ttymouse=xterm2
 endif
 
 if has('persistent_undo')
