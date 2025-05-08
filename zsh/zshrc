@@ -68,6 +68,7 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
-[ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux
+[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf
+[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.tmux ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.tmux
 [ -s ~/.zshrc.local ] && source ~/.zshrc.local

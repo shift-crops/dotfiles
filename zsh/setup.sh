@@ -9,7 +9,9 @@ if [ ! $(which zsh) ]; then
 	sudo apt install zsh && chsh -s $(which zsh)
 fi
 
-[[ ! -s "$ZDOTDIR/.zshrc" ]] && ln -s "$PWD/zshrc" "$ZDOTDIR/.zshrc"
+for FILE in zshrc*; do
+    [[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -s "$PWD/$FILE" "$ZDOTDIR/.$FILE"
+done
 
 if [ ! -d "$ZDOTDIR/.zprezto" ]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "$ZDOTDIR/.zprezto"

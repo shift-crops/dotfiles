@@ -21,6 +21,6 @@ select_session() {
         fi
 }
 
-if [[ -x `which fzf` && ! -n $TMUX ]]; then
+if [[ -x $(which fzf) && ! -n $TMUX ]]; then
 	select_session
 fi
