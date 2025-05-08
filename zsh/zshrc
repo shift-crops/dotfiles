@@ -1,10 +1,10 @@
 setopt histignorealldups sharehistory
 setopt IGNOREEOF
 
-# Keep 10000 lines of history within the shell and save it to ~/.zsh_history:
-HISTSIZE=10000
-SAVEHIST=10000
-HISTFILE=~/.zsh_history
+# Keep 20000 lines of history within the shell
+HISTSIZE=20000
+SAVEHIST=20000
+# HISTFILE=~/.zsh_history
 
 # Use modern completion system
 autoload -Uz compinit
@@ -34,8 +34,7 @@ if [ -x /usr/bin/dircolors ]; then
 	alias ls='ls --color=auto'
 fi
 
-# Set up the prompt
-[ -s ~/.powerline.zsh ] && source ~/.powerline.zsh
+# Set up the prompt (overwrite HISTFILE)
 [ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ] &&  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 autoload -Uz promptinit
 promptinit
@@ -69,7 +68,6 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
-[ -s ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
 [ -s ~/.zshrc.tmux ] && source ~/.zshrc.tmux
 [ -s ~/.zshrc.local ] && source ~/.zshrc.local
-

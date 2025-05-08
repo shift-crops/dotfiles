@@ -1,6 +1,6 @@
-#! /bin/sh
+#!/bin/bash
 
-if [ ! `which vim` ]; then
+if [ ! $(which vim) ]; then
 	sudo apt install vim-gtk3
 fi
 
@@ -12,6 +12,4 @@ if [ ! -d ~/.vim/dein ]; then
 	rm installer.sh
 fi
 
-if [ ! -d ~/.vim/undo ]; then
-	mkdir -p ~/.vim/undo
-fi
+[[ ! -d ~/.vim/undo ]] && mkdir -p ~/.vim/undo
