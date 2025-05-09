@@ -9,6 +9,6 @@ if [ ! -d "$XDG_DATA_FZF" ]; then
     "$XDG_DATA_FZF/install" --xdg
 fi
 
-if [[ ! $(which batcat) || ! $(which tree) ]]; then
-    sudo apt install bat tree
+if [[ ! $(which batcat) || ! $(which tree) || ! $(which rg) ]]; then
+    sudo apt install bat tree ripgrep
 fi

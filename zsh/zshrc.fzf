@@ -8,3 +8,26 @@ export FZF_CTRL_T_OPTS="
 export FZF_ALT_C_OPTS="
   --walker-skip .git,node_modules,target
   --preview 'tree -C {}'"
+
+fzf-grep() {
+  local search_path=$(echo "${LBUFFER}" | rev | cut -d ' ' -f 1 | rev)
+  if [ -n "$search_path" ]; then LBUFFER=${LBUFFER::-${#search_path}} fi
+
+  local selected=$(
+    INITIAL_QUERY=""
+    RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+    FZF_DEFAULT_COMMAND="$RG_PREFIX '$INITIAL_QUERY'" \
+      fzf-tmux -p 90% -m \
+          --bind "change:reload:sleep 0.1; $RG_PREFIX {q} $search_path || true" \
+          --ansi --phony --query "$INITIAL_QUERY" \
+          --preview "echo {} | awk -F ':' '{system(\"batcat --color=always --style=header,grid,numbers -H \"\$2\" \"\$1)}'" \
+      | cut -d ':' -f 1 | sort | uniq | tr '\n' ' ')
+  local ret=$?
+
+  LBUFFER="${LBUFFER}${selected}"
+  zle reset-prompt
+
+  return $ret
+}
+zle -N fzf-grep
+bindkey '^f' fzf-grep
