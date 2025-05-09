@@ -7,7 +7,7 @@ for DIR in *; do
 
     [ -x $DIR/setup.sh ] && $DIR/setup.sh
     for FILE in $DIR/.??*; do
-        [ -f $PWD/$FILE ] && ln -Fis "$PWD/$FILE" $HOME
+        [ -f $PWD/$FILE ] && ln -is "$PWD/$FILE" $HOME
     done
 done
 

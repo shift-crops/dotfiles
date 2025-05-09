@@ -10,7 +10,7 @@ if [ ! $(which tmux) ]; then
     sudo apt install tmux
 fi
 
-[[ ! -s "$XDG_CONFIG_TMUX/tmux.conf" ]] && ln -s "$PWD/tmux.conf" "$XDG_CONFIG_TMUX/tmux.conf"
+[[ ! -s "$XDG_CONFIG_TMUX/tmux.conf" ]] && ln -is "$PWD/tmux.conf" "$XDG_CONFIG_TMUX/tmux.conf"
 
 if [ ! -d "$XDG_DATA_TMUX/plugins/tpm" ]; then
     git clone --depth 1 https://github.com/tmux-plugins/tpm "$XDG_DATA_TMUX/plugins/tpm"

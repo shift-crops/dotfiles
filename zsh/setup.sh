@@ -10,13 +10,13 @@ if [ ! $(which zsh) ]; then
 fi
 
 for FILE in zshrc*; do
-    [[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -s "$PWD/$FILE" "$ZDOTDIR/.$FILE"
+    [[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -is "$PWD/$FILE" "$ZDOTDIR/.$FILE"
 done
 
 if [ ! -d "$ZDOTDIR/.zprezto" ]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "$ZDOTDIR/.zprezto"
 
     for rcfile in $(find "$ZDOTDIR/.zprezto/runcoms/" -type f | grep -v -e README -e zshrc); do
-        ln -s "$rcfile" "$ZDOTDIR/.$(basename $rcfile)"
+        ln -is "$rcfile" "$ZDOTDIR/.$(basename $rcfile)"
     done
 fi

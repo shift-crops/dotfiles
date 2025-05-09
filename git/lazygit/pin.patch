@@ -1,0 +1,12 @@
+diff --git a/pkg/commands/oscommands/cmd_obj_runner.go b/pkg/commands/oscommands/cmd_obj_runner.go
+index 6acd8d0..7c3ff35 100644
+--- a/pkg/commands/oscommands/cmd_obj_runner.go
++++ b/pkg/commands/oscommands/cmd_obj_runner.go
+@@ -385,6 +385,7 @@ func (self *cmdObjRunner) getCheckForCredentialRequestFunc() func([]byte) (Crede
+ 		`Username\s*for\s*'.+':`:                 Username,
+ 		`Enter\s*passphrase\s*for\s*key\s*'.+':`: Passphrase,
+ 		`Enter\s*PIN\s*for\s*.+\s*key\s*.+:`:     PIN,
++		`Enter\s*PIN\s*for\s*'.+':`:              PIN,
+ 		`.*2FA Token.*`:                          Token,
+ 	}
+ 

@@ -1,0 +1,20 @@
+[user]
+	email = simiyu@shift-crops.net
+	name = Shimizu Yutaro
+	signingkey = 39DCD0506225EC2D
+[core]
+	editor = vim
+	pager = delta --side-by-side
+[gpg]
+	program = /usr/bin/gpg
+[commit]
+	gpgsign = false
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+    navigate = true
+    dark = false
+	line-numbers = true
+	keep-plus-minus-markers = true
+[merge]
+    conflictstyle = zdiff3
