@@ -12,8 +12,8 @@
 [interactive]
 	diffFilter = delta --color-only
 [delta]
-    navigate = true
-    dark = false
+	navigate = true
+	dark = false
 	line-numbers = true
 	keep-plus-minus-markers = true
 [merge]
