@@ -69,8 +69,8 @@ if filereadable("/etc/vim/vimrc.local")
 endif
 
 "dein Scripts-----------------------------
-if filereadable(expand('~/.vimrc.dein'))
-  source ~/.vimrc.dein
+if filereadable(expand('~/.vim/vimrc.dein'))
+  source ~/.vim/vimrc.dein
 endif
 "End dein Scripts-------------------------
 
