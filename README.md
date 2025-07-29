@@ -1,6 +1,6 @@
 # dotfiles
 
-zsh, tmux, vim, fzf
+zsh, tmux, git, vim, fzf, yazi
 
 ## Install
 
@@ -11,4 +11,5 @@ $ cd ~/dotfiles && ./install.sh
 
 ## Dependencies
 [dein.vim](https://github.com/Shougo/dein.vim)  
-[fzf](https://github.com/junegunn/fzf.git)  
+[fzf](https://github.com/junegunn/fzf)  
+[yazi](https://github.com/sxyazi/yazi)  
