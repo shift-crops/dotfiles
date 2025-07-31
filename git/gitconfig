@@ -3,7 +3,7 @@
 	name = Shimizu Yutaro
 	signingkey = 39DCD0506225EC2D
 [core]
-	editor = vim
+	editor = nvim
 	pager = delta --side-by-side
 [gpg]
 	program = /usr/bin/gpg
@@ -17,4 +17,4 @@
 	line-numbers = true
 	keep-plus-minus-markers = true
 [merge]
-    conflictstyle = zdiff3
+	conflictstyle = zdiff3

@@ -73,7 +73,7 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
-EDITOR="vim -p"
+EDITOR=nvim
 
 [ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
 [ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf

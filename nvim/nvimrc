@@ -1,0 +1,41 @@
+if has("syntax")
+  syntax on
+endif
+
+set showcmd		" Show (partial) command in status line.
+set showmatch	" Show matching brackets.
+
+set number
+set relativenumber
+set cursorline
+set smartindent
+
+filetype indent plugin on
+set tabstop=4
+set shiftwidth=4
+
+set hlsearch
+
+if has("mouse")
+	set mouse=a
+endif
+
+if has('persistent_undo')
+	set undodir=~/.local/share/nvim/undo
+	set undofile
+endif
+
+noremap <C-j> <esc>
+noremap! <C-j> <esc>
+noremap <Tab> gt
+noremap <S-Tab> gT
+noremap <F1> :map<CR>
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <silent> <Left> :bp<CR>
+noremap <silent> <Right> :bn<CR>
+inoremap <Up> <Nop>
+inoremap <Down> <Nop>
+inoremap <Left> <Nop>
+inoremap <Right> <Nop>
+

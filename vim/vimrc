@@ -8,6 +8,7 @@ set showcmd		" Show (partial) command in status line.
 set showmatch	" Show matching brackets.
 
 set number
+set relativenumber
 set cursorline
 set smartindent
 
@@ -39,8 +40,8 @@ noremap <S-Tab> gT
 noremap <F1> :map<CR>
 noremap <Up> <Nop>
 noremap <Down> <Nop>
-noremap <Left> <Nop>
-noremap <Right> <Nop>
+noremap <silent> <Left> :bp<CR>
+noremap <silent> <Right> :bn<CR>
 inoremap <Up> <Nop>
 inoremap <Down> <Nop>
 inoremap <Left> <Nop>
