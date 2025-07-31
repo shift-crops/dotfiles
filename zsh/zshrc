@@ -44,6 +44,11 @@ prompt powerline
 bindkey -v
 bindkey -M viins '^j' vi-cmd-mode
 bindkey -M vicmd -r '^j'
+
+show-bindkey() { builtin bindkey | less; zle reset-prompt }
+zle -N show-bindkey
+bindkey '\eOP' show-bindkey
+
 function zle-line-init zle-keymap-select {
 	if [ -n "$TMUX" ]; then
 		VIM_NORMAL="#{?client_prefix,#[bg=colour31],#[bg=red]}#[fg=colour255,bold] NORMAL "

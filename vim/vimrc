@@ -36,6 +36,7 @@ noremap <C-j> <esc>
 noremap! <C-j> <esc>
 noremap <Tab> gt
 noremap <S-Tab> gT
+noremap <F1> :map<CR>
 noremap <Up> <Nop>
 noremap <Down> <Nop>
 noremap <Left> <Nop>
