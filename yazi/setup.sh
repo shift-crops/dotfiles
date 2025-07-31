@@ -28,7 +28,8 @@ for FILE in *.toml; do
 done
 
 ya pkg add tkapias/nightfly
+ya pkg add Lil-Dank/lazygit
 
-if [ ! $(which zoxide) ]; then
-	sudo apt install zoxide
+if [[ ! $(which zoxide) || ! $(which fdfind) ]]; then
+	sudo apt install zoxide fd-find
 fi
