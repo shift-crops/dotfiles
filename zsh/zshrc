@@ -73,6 +73,7 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
+path+=($(systemd-path user-binaries))
 EDITOR=nvim
 
 [ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh

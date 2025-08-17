@@ -21,6 +21,8 @@ if [ ! $(which lazygit) ]; then
     if [ ! $(which go) ]; then
         sudo apt install golang
     fi
+    sudo apt install build-essential
+
     git clone --depth 1 https://github.com/jesseduffield/lazygit.git $XDG_DATA_LG
     cp "$PWD/lazygit/pin.patch" "$XDG_DATA_LG/pin.patch"
     (cd $XDG_DATA_LG && \

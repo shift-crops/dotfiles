@@ -8,6 +8,7 @@ if [ ! $(which rustup) ]; then
     sudo apt install rustup
     rustup default stable
     rustup update
+    PATH="$PATH:$HOME/.cargo/bin"
 fi
 
 if [ ! $(which yazi) ]; then
