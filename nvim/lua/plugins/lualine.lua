@@ -10,7 +10,12 @@ return {
 		sections = {
 			lualine_a = {'mode'},
 			lualine_b = {'branch', 'diff', 'diagnostics'},
-			lualine_c = {'filename'},
+			lualine_c = {
+				{
+					'filename',
+					symbols = { readonly = '' },
+				}
+			},
 			lualine_x = {'fileformat', 'encoding', 'filetype'},
 			lualine_y = {'progress'},
 			lualine_z = {'selectioncount', 'location'}
@@ -26,8 +31,9 @@ return {
 		tabline = {
 			lualine_a = {
 				{
-					'buffers',
-					buffers_color = switch_color,
+					'tabs',
+					mode = 2,
+					tabs_color = switch_color,
 					symbols = { modified = ' 󰷥', alternate_file = ' ', directory = ' ' },
 				},
 			},
@@ -36,7 +42,11 @@ return {
 			lualine_x = {},
 			lualine_y = {},
 			lualine_z = {
-				{ 'tabs', tabs_color = switch_color },
+				{
+					'buffers',
+					show_filename_only = false,
+					buffers_color = switch_color,
+				},
 			},
 		},
 	},

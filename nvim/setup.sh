@@ -7,9 +7,8 @@ XDG_DATA_NVIM="${XDG_DATA_HOME:-$HOME/.local/share}/nvim"
 [[ ! -d "$XDG_DATA_NVIM" ]] && mkdir -p "$XDG_DATA_NVIM"
 
 if [ ! $(which nvim) ]; then
-	wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.appimage -O "$XDG_DATA_NVIM/nvim-linux-x86_64.appimage"
-	chmod +x "$XDG_DATA_NVIM/nvim-linux-x86_64.appimage"
-	ln -s "$XDG_DATA_NVIM/nvim-linux-x86_64.appimage" "$HOME/.local/bin/nvim"
+	sudo add-apt-repository ppa:neovim-ppa/unstable
+	sudo apt install neovim
 fi
 
 for FILE in {init.lua,nvimrc,lua}; do
