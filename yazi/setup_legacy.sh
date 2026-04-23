@@ -24,8 +24,8 @@ fi
 # 	sudo ln -s /snap/yazi/current/ya /snap/ya
 # fi
 
-for FILE in *.toml; do
-    [[ ! -s "$XDG_CONFIG_YAZI/$FILE" ]] && ln -is "$PWD/$FILE" "$XDG_CONFIG_YAZI/$FILE"
+for FILE in configs/*.toml; do
+	[[ ! -s "$XDG_CONFIG_YAZI/$FILE" ]] && ln -is "$PWD/$FILE" "$XDG_CONFIG_YAZI/$(basename $FILE)"
 done
 
 ya pkg add tkapias/nightfly

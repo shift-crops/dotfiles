@@ -1,0 +1,47 @@
+---
+- name: Dotfiles Setup
+  hosts: all
+  gather_facts: true
+
+  pre_tasks:
+    - name: Update apt cache
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      tags: always
+
+    - name: Ensure local bin directory exists
+      ansible.builtin.file:
+        path: "{{ local_bin }}"
+        state: directory
+        mode: "0755"
+      tags: always
+
+  roles:
+    # ── others/ (installable standalone via -t fonts / -t fzf / -t powerline) ──
+    - role: fonts
+      tags: [fonts]
+    - role: fzf
+      tags: [fzf]
+    - role: powerline
+      tags: [powerline]
+
+    # ── main components ──────────────────────────────────────────────────────
+    # Dependency edges (handled via include_role in each role's tasks):
+    #   git   → fonts
+    #   nvim  → powerline, fonts
+    #   tmux  → powerline, fonts
+    #   vim   → powerline
+    #   yazi  → fonts
+    #   zsh   → fzf, powerline
+    - role: git
+      tags: [git]
+    - role: nvim
+      tags: [nvim, neovim]
+    - role: tmux
+      tags: [tmux]
+    - role: yazi
+      tags: [yazi]
+    - role: zsh
+      tags: [zsh]

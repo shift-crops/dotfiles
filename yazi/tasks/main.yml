@@ -1,0 +1,134 @@
+---
+# ── dependencies ─────────────────────────────────────────────────────────────
+
+- name: yazi | ensure Nerd Fonts (required by file icons)
+  ansible.builtin.include_role:
+    name: fonts
+    apply:
+      tags: [yazi, fonts]
+  tags: [yazi]
+
+# ── Rust toolchain (via toolchains role) ────────────────────────────────────
+
+- name: yazi | ensure Rust toolchain
+  ansible.builtin.include_role:
+    name: toolchains
+    tasks_from: rust
+
+# ── yazi ────────────────────────────────────────────────────────────────────
+# Installation priority:
+#   [1] Default apt    — used if candidate version ≥ min_versions.yazi
+#   [5] cargo install  — primary fallback; --locked first, --force yazi-build on failure
+
+- name: yazi | check installed version
+  ansible.builtin.command: yazi --version
+  register: _yazi_ver_raw
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: yazi | parse installed version
+  ansible.builtin.set_fact:
+    _yazi_ver: >-
+      {{ (_yazi_ver_raw.stdout | regex_search('[Yy]azi ([0-9]+\.[0-9]+\.[0-9]+)', '\1') | first)
+         if _yazi_ver_raw.rc == 0 else '0.0.0' }}
+
+- name: yazi | install
+  when: _yazi_ver is version(min_versions.yazi, '<')
+  block:
+    # ── step 1: check default apt candidate ──────────────────────────────────
+    - name: yazi | check apt candidate version
+      ansible.builtin.shell: |
+        ver=$(apt-cache policy yazi 2>/dev/null | awk '/Candidate:/{print $2}')
+        { [ "$ver" = "(none)" ] || [ -z "$ver" ]; } && echo "0.0.0" || echo "$ver"
+      register: _apt_yazi_ver
+      changed_when: false
+
+    # ── step 2: use default apt if it satisfies the minimum ──────────────────
+    - name: yazi | install from apt
+      become: true
+      ansible.builtin.apt:
+        name: yazi
+        state: present
+      when: _apt_yazi_ver.stdout is version(min_versions.yazi, '>=')
+
+    # ── step 3: cargo install — with yazi-build rescue ───────────────────────
+    - name: yazi | install via cargo
+      when: _apt_yazi_ver.stdout is version(min_versions.yazi, '<')
+      block:
+        - name: yazi | cargo install (locked)
+          ansible.builtin.shell: |
+            set -o pipefail
+            cargo install --locked yazi-fm yazi-cli 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+          args:
+            executable: /bin/bash
+          environment:
+            PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+      rescue:
+        - name: yazi | cargo install (locked) failed — try force build
+          ansible.builtin.shell: |
+            set -o pipefail
+            cargo install --force yazi-build 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+          args:
+            executable: /bin/bash
+          environment:
+            PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+# ── yazi dependencies ────────────────────────────────────────────────────────
+
+- name: yazi | install apt dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - zoxide
+      - fd-find
+    state: present
+
+# ── yazi config ──────────────────────────────────────────────────────────────
+
+- name: yazi | ensure config directory
+  ansible.builtin.file:
+    path: "{{ yazi_config_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: yazi | discover configs
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/yazi/configs"
+    file_type: any
+    depth: 1
+  register: _yazi_configs
+
+- name: yazi | symlink all configs
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ yazi_config_dir }}/{{ item.path | basename }}"
+    state: link
+  loop: "{{ _yazi_configs.files }}"
+
+# ── yazi plugins ─────────────────────────────────────────────────────────────
+
+- name: yazi | check if ya CLI is usable
+  ansible.builtin.command: ya --version
+  register: _ya_check
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: yazi | install nightfly flavor
+  ansible.builtin.command: ya pkg add tkapias/nightfly
+  args:
+    creates: "{{ yazi_config_dir }}/flavors/nightfly.yazi"
+  when: _ya_check.rc == 0
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: yazi | install lazygit plugin
+  ansible.builtin.command: ya pkg add Lil-Dank/lazygit
+  args:
+    creates: "{{ yazi_config_dir }}/plugins/lazygit.yazi"
+  when: _ya_check.rc == 0
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"

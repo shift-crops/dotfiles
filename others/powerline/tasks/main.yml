@@ -1,0 +1,9 @@
+---
+# ── powerline ────────────────────────────────────────────────────────────────
+# Install method: [1] apt
+
+- name: powerline | install via apt
+  become: true
+  ansible.builtin.apt:
+    name: powerline
+    state: present

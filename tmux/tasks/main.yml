@@ -1,0 +1,62 @@
+---
+# ── dependencies ─────────────────────────────────────────────────────────────
+# powerline: tmux status bar
+# fonts: powerline special symbols require Nerd Fonts (which include powerline glyphs)
+
+- name: tmux | ensure powerline (required by status bar)
+  ansible.builtin.include_role:
+    name: powerline
+    apply:
+      tags: [tmux, powerline]
+  tags: [tmux]
+
+- name: tmux | ensure Nerd Fonts (required by powerline symbols)
+  ansible.builtin.include_role:
+    name: fonts
+    apply:
+      tags: [tmux, fonts]
+  tags: [tmux]
+
+# ── tmux ────────────────────────────────────────────────────────────────────
+# Install method: [1] apt default (Ubuntu 22.04 ships 3.2a ≥ 3.2)
+
+- name: tmux | install via apt
+  become: true
+  ansible.builtin.apt:
+    name: tmux
+    state: present
+
+- name: tmux | ensure config directory
+  ansible.builtin.file:
+    path: "{{ tmux_config_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: tmux | ensure data directory
+  ansible.builtin.file:
+    path: "{{ tmux_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: tmux | discover configs
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/tmux/configs"
+    file_type: any
+    depth: 1
+  register: _tmux_configs
+
+- name: tmux | symlink all configs
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ tmux_config_dir }}/{{ item.path | basename }}"
+    state: link
+  loop: "{{ _tmux_configs.files }}"
+
+# ── tpm (Tmux Plugin Manager) ────────────────────────────────────────────────
+
+- name: tmux | clone tpm
+  ansible.builtin.git:
+    repo: https://github.com/tmux-plugins/tpm.git
+    dest: "{{ tmux_data_dir }}/plugins/tpm"
+    depth: 1
+    update: true

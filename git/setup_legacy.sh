@@ -9,7 +9,7 @@ if [ ! $(which git) ]; then
     sudo apt install git
 fi
 
-[[ ! -s "$XDG_CONFIG_GIT/config" ]] && ln -is "$PWD/gitconfig" "$XDG_CONFIG_GIT/config"
+[[ ! -s "$XDG_CONFIG_GIT/config" ]] && ln -is "$PWD/configs/config" "$XDG_CONFIG_GIT/config"
 
 XDG_CONFIG_LG="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
 XDG_DATA_LG="${XDG_DATA_HOME:-$HOME/.local/share}/lazygit"
@@ -24,7 +24,7 @@ if [ ! $(which lazygit) ]; then
     sudo apt install build-essential
 
     git clone --depth 1 https://github.com/jesseduffield/lazygit.git $XDG_DATA_LG
-    cp "$PWD/lazygit/pin.patch" "$XDG_DATA_LG/pin.patch"
+    cp "$PWD/lazygit_pin.patch" "$XDG_DATA_LG/pin.patch"
     (cd $XDG_DATA_LG && \
     git apply pin.patch && \
     go build)
@@ -32,7 +32,7 @@ if [ ! $(which lazygit) ]; then
     ln -is "$XDG_DATA_LG/lazygit" "$HOME/.local/bin/lazygit"
 fi
 
-[[ ! -s "$XDG_CONFIG_LG/config.yml" ]] && ln -is "$PWD/lazygit/config.yml" "$XDG_CONFIG_LG/config.yml"
+[[ ! -s "$XDG_CONFIG_LG/config.yml" ]] && ln -is "$PWD/configs/lazygit/config.yml" "$XDG_CONFIG_LG/config.yml"
 
 if [ ! $(which delta) ]; then
     if [ ! $(which curl) ]; then

@@ -1,0 +1,11 @@
+---
+# Go toolchain — install method: [1] apt
+# golang-go on Ubuntu 22.04 provides Go 1.18+, sufficient for building lazygit.
+
+- name: toolchains/go | install golang-go and build-essential
+  become: true
+  ansible.builtin.apt:
+    name:
+      - golang-go
+      - build-essential
+    state: present

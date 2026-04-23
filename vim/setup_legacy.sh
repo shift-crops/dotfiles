@@ -9,7 +9,7 @@ if [ ! $(which vim) ]; then
 fi
 
 for FILE in vimrc*; do
-    [[ ! -s "$VDOTDIR/$FILE" ]] && ln -is "$PWD/$FILE" "$VDOTDIR/$FILE"
+    [[ ! -s "$VDOTDIR/$FILE" ]] && ln -is "$PWD/configs/$FILE" "$VDOTDIR/$FILE"
 done
 
 if [ ! -d "$VDOTDIR/dein" ]; then

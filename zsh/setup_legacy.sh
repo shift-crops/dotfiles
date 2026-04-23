@@ -9,8 +9,8 @@ if [ ! $(which zsh) ]; then
 	sudo apt install zsh && chsh -s $(which zsh)
 fi
 
-for FILE in zshrc*; do
-    [[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -is "$PWD/$FILE" "$ZDOTDIR/.$FILE"
+for FILE in configs/zshrc*; do
+	[[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -is "$PWD/$FILE" "$ZDOTDIR/.$(basename $FILE)"
 done
 
 if [ ! -d "$ZDOTDIR/.zprezto" ]; then

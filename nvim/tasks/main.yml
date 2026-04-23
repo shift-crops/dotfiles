@@ -1,0 +1,158 @@
+---
+# ── dependencies ─────────────────────────────────────────────────────────────
+
+- name: nvim | ensure powerline (required by lualine)
+  ansible.builtin.include_role:
+    name: powerline
+    apply:
+      tags: [nvim, neovim, powerline]
+  tags: [nvim, neovim]
+
+- name: nvim | ensure Nerd Fonts (required by lualine / neo-tree icons)
+  ansible.builtin.include_role:
+    name: fonts
+    apply:
+      tags: [nvim, neovim, fonts]
+  tags: [nvim, neovim]
+
+# ── neovim ──────────────────────────────────────────────────────────────────
+# Installation priority:
+#   [1] Default apt    — used if candidate version ≥ min_versions.neovim
+#   [2] PPA            — ppa:neovim-ppa/unstable when default apt is too old
+#   [4] AppImage       — fallback when PPA fails; fuse-aware (extract if no fuse)
+
+- name: nvim | check installed version
+  ansible.builtin.command: nvim --version
+  register: _nvim_ver_raw
+  changed_when: false
+  failed_when: false
+
+- name: nvim | parse installed version
+  ansible.builtin.set_fact:
+    _nvim_ver: >-
+      {{ (_nvim_ver_raw.stdout | regex_search('NVIM v([0-9]+\.[0-9]+\.[0-9]+)', '\1') | first)
+         if _nvim_ver_raw.rc == 0 else '0.0.0' }}
+
+- name: nvim | install neovim
+  when: _nvim_ver is version(min_versions.neovim, '<')
+  block:
+    # ── step 1: check default apt candidate ──────────────────────────────────
+    - name: nvim | check apt candidate version
+      ansible.builtin.shell: |
+        ver=$(apt-cache policy neovim 2>/dev/null | awk '/Candidate:/{print $2}')
+        { [ "$ver" = "(none)" ] || [ -z "$ver" ]; } && echo "0.0.0" || echo "$ver"
+      register: _apt_nvim_ver
+      changed_when: false
+
+    # ── step 2: use default apt if it satisfies the minimum ──────────────────
+    - name: nvim | install from default apt
+      become: true
+      ansible.builtin.apt:
+        name: neovim
+        state: present
+      when: _apt_nvim_ver.stdout is version(min_versions.neovim, '>=')
+
+    # ── step 3: PPA — with AppImage rescue when PPA itself fails ─────────────
+    - name: nvim | install from PPA (AppImage on failure)
+      when: _apt_nvim_ver.stdout is version(min_versions.neovim, '<')
+      block:
+        - name: nvim | install software-properties-common
+          become: true
+          ansible.builtin.apt:
+            name: software-properties-common
+            state: present
+
+        - name: nvim | add unstable PPA
+          become: true
+          ansible.builtin.apt_repository:
+            repo: ppa:neovim-ppa/unstable
+            state: present
+            update_cache: true
+
+        - name: nvim | install neovim from PPA
+          become: true
+          ansible.builtin.apt:
+            name: neovim
+            state: present
+
+      rescue:
+        # ── step 4: AppImage fallback ─────────────────────────────────────────
+        - name: nvim | PPA failed — check FUSE availability
+          ansible.builtin.command: fusermount -V
+          register: _fuse_check
+          changed_when: false
+          failed_when: false
+
+        # fuse available: run AppImage directly
+        - name: nvim | AppImage (FUSE)
+          when: _fuse_check.rc == 0
+          block:
+            - name: nvim | download AppImage
+              ansible.builtin.get_url:
+                url: https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.appimage
+                dest: "{{ nvim_data_dir }}/nvim-linux-x86_64.appimage"
+                mode: "0755"
+
+            - name: nvim | symlink AppImage to local bin
+              ansible.builtin.file:
+                src: "{{ nvim_data_dir }}/nvim-linux-x86_64.appimage"
+                dest: "{{ local_bin }}/nvim"
+                state: link
+
+        # no fuse: extract AppImage and symlink AppRun
+        - name: nvim | AppImage (no FUSE — extract)
+          when: _fuse_check.rc != 0
+          block:
+            - name: nvim | download AppImage to /tmp
+              ansible.builtin.get_url:
+                url: https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.appimage
+                dest: /tmp/nvim-linux-x86_64.appimage
+                mode: "0755"
+
+            - name: nvim | extract AppImage
+              ansible.builtin.command:
+                cmd: ./nvim-linux-x86_64.appimage --appimage-extract
+                chdir: /tmp
+                creates: /tmp/squashfs-root
+
+            - name: nvim | move extracted tree to data directory
+              ansible.builtin.command:
+                cmd: mv /tmp/squashfs-root "{{ nvim_data_dir }}/squashfs-root"
+                creates: "{{ nvim_data_dir }}/squashfs-root"
+
+            - name: nvim | symlink AppRun to local bin
+              ansible.builtin.file:
+                src: "{{ nvim_data_dir }}/squashfs-root/AppRun"
+                dest: "{{ local_bin }}/nvim"
+                state: link
+
+# ── config ───────────────────────────────────────────────────────────────────
+
+- name: nvim | ensure config directory
+  ansible.builtin.file:
+    path: "{{ nvim_config_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: nvim | ensure data and undo directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ nvim_data_dir }}"
+    - "{{ nvim_data_dir }}/undo"
+
+- name: nvim | discover configs
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/nvim/configs"
+    file_type: any
+    depth: 1
+  register: _nvim_configs
+
+- name: nvim | symlink all configs
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ nvim_config_dir }}/{{ item.path | basename }}"
+    state: link
+  loop: "{{ _nvim_configs.files }}"

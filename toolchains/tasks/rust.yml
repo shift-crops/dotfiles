@@ -1,0 +1,26 @@
+---
+# Rust toolchain via rustup — install method: [1] apt (Ubuntu 22.04+)
+
+- name: toolchains/rust | install rustup via apt
+  become: true
+  ansible.builtin.apt:
+    name: rustup
+    state: present
+
+- name: toolchains/rust | set stable toolchain as default
+  ansible.builtin.command: rustup default stable
+  register: _rustup_default
+  changed_when: "'unchanged' not in _rustup_default.stdout"
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: toolchains/rust | update Rust toolchain
+  ansible.builtin.shell: |
+    set -o pipefail
+    rustup update 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+  args:
+    executable: /bin/bash
+  register: _rustup_update
+  changed_when: "'Updated' in _rustup_update.stdout"
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"

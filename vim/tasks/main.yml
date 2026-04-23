@@ -1,0 +1,61 @@
+---
+# ── dependencies ─────────────────────────────────────────────────────────────
+# powerline: vim statusline uses the Python powerline package
+
+- name: vim | ensure powerline (required by vim statusline)
+  ansible.builtin.include_role:
+    name: powerline
+    apply:
+      tags: [vim, powerline]
+  tags: [vim]
+
+# ── vim ─────────────────────────────────────────────────────────────────────
+# Install method: [1] apt (vim-gtk3)
+
+- name: vim | install vim-gtk3 via apt
+  become: true
+  ansible.builtin.apt:
+    name:
+      - vim-gtk3
+      - curl
+    state: present
+
+- name: vim | ensure vim directory
+  ansible.builtin.file:
+    path: "{{ vim_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: vim | ensure undo directory
+  ansible.builtin.file:
+    path: "{{ vim_dir }}/undo"
+    state: directory
+    mode: "0755"
+
+- name: vim | discover configs
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/vim/configs"
+    file_type: any
+    depth: 1
+  register: _vim_configs
+
+- name: vim | symlink all configs
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ vim_dir }}/{{ item.path | basename }}"
+    state: link
+  loop: "{{ _vim_configs.files }}"
+
+# ── dein.vim (plugin manager) ────────────────────────────────────────────────
+# Install method: [4] official installer script from GitHub
+
+- name: vim | install dein.vim
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsSL https://raw.githubusercontent.com/Shougo/dein-installer.vim/main/installer.sh \
+      -o /tmp/dein-installer.sh
+    sh /tmp/dein-installer.sh "{{ vim_dir }}/dein" 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+    rm -f /tmp/dein-installer.sh
+  args:
+    executable: /bin/bash
+    creates: "{{ vim_dir }}/dein"

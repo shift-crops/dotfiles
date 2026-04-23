@@ -1,0 +1,11 @@
+---
+# Utility role — do not add to site.yml directly.
+# Call specific toolchains from other roles:
+#
+#   - ansible.builtin.include_role:
+#       name: toolchains
+#       tasks_from: go      # golang-go + build-essential
+#
+#   - ansible.builtin.include_role:
+#       name: toolchains
+#       tasks_from: rust    # rustup + stable toolchain

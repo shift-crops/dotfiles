@@ -1,0 +1,3 @@
+---
+zdotdir:     "{{ xdg_config_home }}/zsh"
+prezto_dir:  "{{ xdg_config_home }}/zsh/.zprezto"

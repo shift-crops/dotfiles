@@ -1,0 +1,38 @@
+---
+# Dotfiles root — same directory as site.yml
+dotfiles_dir: "{{ playbook_dir }}"
+
+# XDG Base Directories
+xdg_config_home: "{{ lookup('env', 'XDG_CONFIG_HOME') or (ansible_env.HOME + '/.config') }}"
+xdg_data_home: "{{ lookup('env', 'XDG_DATA_HOME') or (ansible_env.HOME + '/.local/share') }}"
+xdg_cache_home: "{{ lookup('env', 'XDG_CACHE_HOME') or (ansible_env.HOME + '/.cache') }}"
+local_bin:  "{{ ansible_env.HOME }}/.local/bin"
+cargo_bin:  "{{ ansible_env.HOME }}/.cargo/bin"
+
+# Minimum required versions.
+# The comment after each entry shows which install method was chosen and why.
+# Priority order:
+#   1. apt (default Ubuntu repository)
+#   2. apt + official PPA  (e.g. ppa:neovim-ppa/unstable)
+#   3. Other binary package manager (snap — not used here)
+#   4. Direct binary download (GitHub releases .deb / .zip / AppImage)
+#   5. Build from source (cargo, go)
+min_versions:
+  git:            "2.34.0"   # [1] apt — Ubuntu 22.04 ships 2.34.1
+  delta:          "0.16.0"   # [4] GitHub .deb release — not in apt
+  lazygit:        "0.40.0"   # [5] go build — custom patch required
+  neovim:         "0.10.0"   # [2] ppa:neovim-ppa/unstable
+  tmux:           "3.2"      # [1] apt — Ubuntu 22.04 ships 3.2a
+  vim:            "8.2"      # [1] apt (vim-gtk3)
+  zsh:            "5.8"      # [1] apt
+  rustup:         "1.27.0"   # [1] apt — available on Ubuntu 22.04+
+  yazi:           "0.3.0"    # [5] cargo install — most up-to-date method
+  fzf:            "0.42.0"   # [4] git clone + official installer
+  bat:            "0.22.0"   # [1] apt (package name: bat)
+  ripgrep:        "13.0.0"   # [1] apt
+  tree:           "2.0"      # [1] apt
+  zoxide:         "0.9.0"    # [1] apt
+  fd:             "8.6.0"    # [1] apt (package name: fd-find)
+  powerline:      "2.8"      # [1] apt
+  hack_nerd_font: "3.4.0"    # [4] GitHub Nerd Fonts release
+  go:             "1.18.0"   # [1] apt (golang-go) — sufficient for building lazygit

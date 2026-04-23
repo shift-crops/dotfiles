@@ -1,0 +1,85 @@
+---
+# ── dependencies ─────────────────────────────────────────────────────────────
+# fzf:       sourced via zshrc.fzf for fuzzy completion and history search
+# powerline: zsh prompt uses the powerline daemon
+
+- name: zsh | ensure fzf (required by zshrc.fzf)
+  ansible.builtin.include_role:
+    name: fzf
+    apply:
+      tags: [zsh, fzf]
+  tags: [zsh]
+
+- name: zsh | ensure powerline (required by zsh prompt)
+  ansible.builtin.include_role:
+    name: powerline
+    apply:
+      tags: [zsh, powerline]
+  tags: [zsh]
+
+# ── zsh ─────────────────────────────────────────────────────────────────────
+# Install method: [1] apt
+
+- name: zsh | install via apt
+  become: true
+  ansible.builtin.apt:
+    name: zsh
+    state: present
+
+- name: zsh | set as default shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: /usr/bin/zsh
+
+- name: zsh | ensure ZDOTDIR
+  ansible.builtin.file:
+    path: "{{ zdotdir }}"
+    state: directory
+    mode: "0755"
+
+# configs/ auto-symlink:
+#   .zshenv  → $HOME/.zshenv      (zsh reads this before ZDOTDIR is set)
+#   zshrc*   → $ZDOTDIR/.zshrc*   (sourced after ZDOTDIR is set; basename gets a leading dot)
+
+- name: zsh | discover all configs (including hidden files)
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dir }}/zsh/configs"
+    file_type: any
+    depth: 1
+    hidden: true
+  register: _zsh_configs
+
+- name: zsh | symlink .zshenv to HOME
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/{{ item.path | basename }}"
+    state: link
+  loop: "{{ _zsh_configs.files | selectattr('path', 'search', '/\\.zshenv$') | list }}"
+
+- name: zsh | symlink other configs to ZDOTDIR (prepend dot to basename)
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ zdotdir }}/.{{ item.path | basename }}"
+    state: link
+  loop: "{{ _zsh_configs.files | rejectattr('path', 'search', '/\\.zshenv$') | list }}"
+
+# ── prezto ───────────────────────────────────────────────────────────────────
+
+- name: zsh | clone prezto (with submodules)
+  ansible.builtin.shell: |
+    set -o pipefail
+    git clone --recursive --depth 1 https://github.com/sorin-ionescu/prezto.git "{{ prezto_dir }}" 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+  args:
+    executable: /bin/bash
+    creates: "{{ prezto_dir }}/.git"
+
+- name: zsh | symlink prezto runcom files
+  # Links zlogin, zlogout, zprofile, zpreztorc, zshenv (but not README or zshrc)
+  ansible.builtin.shell: |
+    for rcfile in $(find "{{ prezto_dir }}/runcoms/" -maxdepth 1 -type f \
+                         ! -name 'README*' ! -name 'zshrc'); do
+      target="{{ zdotdir }}/.$(basename "$rcfile")"
+      [ -e "$target" ] || ln -s "$rcfile" "$target"
+    done
+  changed_when: false

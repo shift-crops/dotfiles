@@ -1,0 +1,69 @@
+---
+# ── fzf dependencies ─────────────────────────────────────────────────────────
+# Install method: [1] apt
+
+- name: fzf | install apt dependencies (bat, tree, ripgrep)
+  become: true
+  ansible.builtin.apt:
+    name:
+      - bat
+      - tree
+      - ripgrep
+    state: present
+
+# ── fzf ─────────────────────────────────────────────────────────────────────
+# Installation priority:
+#   [1] Default apt    — used if candidate version ≥ min_versions.fzf
+#   [4] git clone      — official installer with --xdg (sets up XDG shell integration)
+
+- name: fzf | check installed version
+  ansible.builtin.command: fzf --version
+  register: _fzf_ver_raw
+  changed_when: false
+  failed_when: false
+
+- name: fzf | parse installed version
+  ansible.builtin.set_fact:
+    _fzf_ver: >-
+      {{ (_fzf_ver_raw.stdout | regex_search('^([0-9]+\.[0-9]+\.[0-9]+)', '\1') | first)
+         if _fzf_ver_raw.rc == 0 else '0.0.0' }}
+
+- name: fzf | install
+  when: _fzf_ver is version(min_versions.fzf, '<')
+  block:
+    # ── step 1: check default apt candidate ──────────────────────────────────
+    - name: fzf | check apt candidate version
+      ansible.builtin.shell: |
+        ver=$(apt-cache policy fzf 2>/dev/null | awk '/Candidate:/{print $2}')
+        { [ "$ver" = "(none)" ] || [ -z "$ver" ]; } && echo "0.0.0" || echo "$ver"
+      register: _apt_fzf_ver
+      changed_when: false
+
+    # ── step 2: use default apt if it satisfies the minimum ──────────────────
+    - name: fzf | install from apt
+      become: true
+      ansible.builtin.apt:
+        name: fzf
+        state: present
+      when: _apt_fzf_ver.stdout is version(min_versions.fzf, '>=')
+
+    # ── step 3: git clone + official installer ────────────────────────────────
+    # --xdg places shell integration scripts under $XDG_CONFIG_HOME/fzf/,
+    # which is the path expected by zshrc.fzf.
+    - name: fzf | install from git
+      when: _apt_fzf_ver.stdout is version(min_versions.fzf, '<')
+      block:
+        - name: fzf | clone repository
+          ansible.builtin.git:
+            repo: https://github.com/junegunn/fzf.git
+            dest: "{{ fzf_data_dir }}"
+            depth: 1
+            update: true
+
+        - name: fzf | run installer
+          ansible.builtin.command:
+            cmd: >
+              {{ fzf_data_dir }}/install
+              --xdg --no-bash --no-fish
+              --key-bindings --completion --no-update-rc
+            creates: "{{ fzf_data_dir }}/bin/fzf"

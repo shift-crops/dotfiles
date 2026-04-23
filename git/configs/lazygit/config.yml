@@ -2,8 +2,8 @@ gui:
   nerdFontsVersion: "3"
 git:
   autoFetch: false
-  paging:
-    colorArg: always
-    pager: delta --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --paging=never
 os:
   editPreset: 'nvim-remote'

@@ -1,0 +1,46 @@
+---
+# ── Hack Nerd Font ──────────────────────────────────────────────────────────
+# Install method: [4] GitHub Nerd Fonts releases (no apt package available)
+
+- name: fonts | install dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - unzip
+      - fontconfig   # provides fc-cache
+    state: present
+
+- name: fonts | check if Hack Nerd Font is already installed
+  ansible.builtin.stat:
+    path: "{{ hack_nerd_font_dir }}/HackNerdFontMono-Regular.ttf"
+  register: _hack_font_stat
+
+- name: fonts | install Hack Nerd Font
+  when: not _hack_font_stat.stat.exists
+  block:
+    - name: fonts | ensure font directory
+      ansible.builtin.file:
+        path: "{{ hack_nerd_font_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: fonts | download Hack.zip
+      ansible.builtin.get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ hack_font_version }}/Hack.zip"
+        dest: /tmp/HackNerdFont.zip
+        mode: "0644"
+
+    - name: fonts | extract Hack Nerd Font
+      ansible.builtin.unarchive:
+        src: /tmp/HackNerdFont.zip
+        dest: "{{ hack_nerd_font_dir }}"
+        remote_src: true
+
+    - name: fonts | remove downloaded zip
+      ansible.builtin.file:
+        path: /tmp/HackNerdFont.zip
+        state: absent
+
+    - name: fonts | rebuild font cache
+      ansible.builtin.command: fc-cache -v
+      changed_when: true

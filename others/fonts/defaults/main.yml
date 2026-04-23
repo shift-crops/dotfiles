@@ -1,0 +1,4 @@
+---
+fonts_dir:          "{{ xdg_data_home }}/fonts"
+hack_nerd_font_dir: "{{ xdg_data_home }}/fonts/HackNerdFont"
+hack_font_version:  "{{ min_versions.hack_nerd_font }}"

@@ -11,8 +11,8 @@ if [ ! $(which nvim) ]; then
 	sudo apt install neovim
 fi
 
-for FILE in {init.lua,nvimrc,lua}; do
-    [[ ! -s "$XDG_CONFIG_NVIM/$FILE" ]] && ln -is "$PWD/$FILE" "$XDG_CONFIG_NVIM/$FILE"
+for FILE in configs/{init.lua,nvimrc,lua}; do
+	[[ ! -s "$XDG_CONFIG_NVIM/$FILE" ]] && ln -is "$PWD/$FILE" "$XDG_CONFIG_NVIM/$(basename $FILE)"
 done
 
 [[ ! -d "$XDG_DATA_NVIM/undo" ]] && mkdir -p "$XDG_DATA_NVIM/undo"
