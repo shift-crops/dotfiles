@@ -32,10 +32,12 @@ return {
 			lualine_a = {
 				{
 					'tabs',
-					mode = 2,
-					tabs_color = switch_color,
-					symbols = { modified = ' 󰷥', alternate_file = ' ', directory = ' ' },
+					show_modified_status = false,
 				},
+				{
+					'windows',
+					symbols = { modified = ' 󰷥', alternate_file = ' ', directory = ' ' },
+				}
 			},
 			lualine_b = {},
 			lualine_c = {},

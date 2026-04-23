@@ -5,3 +5,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     vim.highlight.on_yank({ higroup = 'YankHighlight', timeout = 500 })
   end,
 })
+
+vim.api.nvim_create_autocmd({ "WinEnter", "FocusGained", "BufEnter" }, {
+  pattern = "*",
+  command = "checktime",
+})
+
+vim.opt.fillchars = { stlnc = "─", }
