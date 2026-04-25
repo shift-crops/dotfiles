@@ -4,6 +4,7 @@
 - name: nvim | ensure powerline (required by lualine)
   ansible.builtin.include_role:
     name: powerline
+    allow_duplicates: false
     apply:
       tags: [nvim, neovim, powerline]
   tags: [nvim, neovim]
@@ -11,6 +12,7 @@
 - name: nvim | ensure Nerd Fonts (required by lualine / neo-tree icons)
   ansible.builtin.include_role:
     name: fonts
+    allow_duplicates: false
     apply:
       tags: [nvim, neovim, fonts]
   tags: [nvim, neovim]
@@ -18,6 +20,7 @@
 - name: nvim | ensure tree-sitter (required by nvim-treesitter)
   ansible.builtin.include_role:
     name: tree-sitter
+    allow_duplicates: false
     apply:
       tags: [nvim, neovim, tree-sitter]
   tags: [nvim, neovim]

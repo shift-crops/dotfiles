@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd $(dirname $0)
+DOTFILES_DIR="$(pwd)"
 
 # ── bootstrap ansible ────────────────────────────────────────────────────────
 if ! command -v ansible-playbook &>/dev/null; then

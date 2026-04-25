@@ -24,6 +24,7 @@
       ansible.builtin.include_role:
         name: toolchains
         tasks_from: node
+        allow_duplicates: false
 
     - name: tree-sitter | install via npm
       ansible.builtin.shell: |
@@ -39,6 +40,7 @@
       ansible.builtin.include_role:
         name: toolchains
         tasks_from: rust
+        allow_duplicates: false
 
     - name: tree-sitter | install via cargo
       ansible.builtin.shell: |

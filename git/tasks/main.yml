@@ -4,6 +4,7 @@
 - name: git | ensure Nerd Fonts (required by lazygit UI)
   ansible.builtin.include_role:
     name: fonts
+    allow_duplicates: false
     apply:
       tags: [git, fonts]
   tags: [git]
@@ -106,6 +107,7 @@
               ansible.builtin.include_role:
                 name: toolchains
                 tasks_from: rust
+                allow_duplicates: false
 
             - name: delta | cargo install git-delta
               ansible.builtin.shell: |
@@ -122,9 +124,9 @@
             state: absent
 
 # ── lazygit ─────────────────────────────────────────────────────────────────
-# Installation method: [5] go build only.
-# A custom lazygit_pin.patch must be applied before building, so pre-built binaries
-# (apt, GitHub releases) cannot be used here.
+# Installation priority:
+#   [1] apt       — used if candidate version ≥ min_versions.lazygit
+#   [5] go build  — fallback; custom pin patch applied before build
 
 - name: lazygit | check installed version
   ansible.builtin.command: lazygit --version
@@ -138,45 +140,58 @@
       {{ (_lg_ver_raw.stdout | regex_search('version=([0-9]+\.[0-9]+\.[0-9]+)', '\1') | first)
          if _lg_ver_raw.rc == 0 else '0.0.0' }}
 
-- name: lazygit | build from source
+- name: lazygit | install
   when: _lg_ver is version(min_versions.lazygit, '<')
   block:
-    - name: lazygit | ensure Go toolchain
-      ansible.builtin.include_role:
-        name: toolchains
-        tasks_from: go
-
-    - name: lazygit | clone repository
-      ansible.builtin.git:
-        repo: https://github.com/jesseduffield/lazygit.git
-        dest: "{{ lazygit_data_dir }}"
-        depth: 1
-        update: false
-
-    - name: lazygit | apply lazygit_pin.patch
-      ansible.builtin.command:
-        cmd: git apply "{{ dotfiles_dir }}/git/lazygit_pin.patch"
-        chdir: "{{ lazygit_data_dir }}"
-      register: _lg_patch
-      changed_when: _lg_patch.rc == 0
-      failed_when: false   # patch may already be applied on re-run
-
-    - name: lazygit | build binary
+    # ── step 1: check apt candidate ──────────────────────────────────────────
+    - name: lazygit | check apt candidate version
       ansible.builtin.shell: |
-        set -o pipefail
-        go build 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
-      args:
-        chdir: "{{ lazygit_data_dir }}"
-        executable: /bin/bash
-        creates: "{{ lazygit_data_dir }}/lazygit"
-      environment:
-        HOME: "{{ ansible_env.HOME }}"
+        ver=$(apt-cache policy lazygit 2>/dev/null | awk '/Candidate:/{print $2}')
+        { [ "$ver" = "(none)" ] || [ -z "$ver" ]; } && echo "0.0.0" || echo "$ver"
+      register: _apt_lg_ver
+      changed_when: false
 
-    - name: lazygit | symlink binary to local bin
-      ansible.builtin.file:
-        src: "{{ lazygit_data_dir }}/lazygit"
-        dest: "{{ local_bin }}/lazygit"
-        state: link
+    # ── step 2: install from apt if candidate satisfies minimum ──────────────
+    - name: lazygit | install from apt
+      become: true
+      ansible.builtin.apt:
+        name: lazygit
+        state: present
+      when: _apt_lg_ver.stdout is version(min_versions.lazygit, '>=')
+
+    # ── step 3: go build fallback ─────────────────────────────────────────────
+    - name: lazygit | build from source
+      when: _apt_lg_ver.stdout is version(min_versions.lazygit, '<')
+      block:
+        - name: lazygit | ensure Go toolchain
+          ansible.builtin.include_role:
+            name: toolchains
+            tasks_from: go
+            allow_duplicates: false
+
+        - name: lazygit | clone repository
+          ansible.builtin.git:
+            repo: https://github.com/jesseduffield/lazygit.git
+            dest: "{{ lazygit_data_dir }}"
+            depth: 1
+            update: false
+
+        - name: lazygit | build binary
+          ansible.builtin.shell: |
+            set -o pipefail
+            go build 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+          args:
+            chdir: "{{ lazygit_data_dir }}"
+            executable: /bin/bash
+            creates: "{{ lazygit_data_dir }}/lazygit"
+          environment:
+            HOME: "{{ ansible_env.HOME }}"
+
+        - name: lazygit | symlink binary to local bin
+          ansible.builtin.file:
+            src: "{{ lazygit_data_dir }}/lazygit"
+            dest: "{{ local_bin }}/lazygit"
+            state: link
 
 - name: lazygit | ensure config directory
   ansible.builtin.file:

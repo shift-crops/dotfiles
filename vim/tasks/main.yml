@@ -5,6 +5,7 @@
 - name: vim | ensure powerline (required by vim statusline)
   ansible.builtin.include_role:
     name: powerline
+    allow_duplicates: false
     apply:
       tags: [vim, powerline]
   tags: [vim]

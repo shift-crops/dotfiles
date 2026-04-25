@@ -97,6 +97,7 @@
   ansible.builtin.include_role:
     name: toolchains
     tasks_from: rust
+    allow_duplicates: false
   when: _fzfdep_cargo | length > 0
 
 - name: fzf deps | install unavailable tools via cargo

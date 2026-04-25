@@ -18,17 +18,37 @@
         mode: "0755"
       tags: always
 
-  roles:
+  tasks:
     # ── deps/ (installable standalone via -t <tag>) ──────────────────────────
-    - role: fonts
-      tags: [fonts]
-    - role: fzf
-      tags: [fzf]
-    - role: powerline
-      tags: [powerline]
-    - role: tree-sitter
-      tags: [tree-sitter]
+    - name: deps | fonts
+      ansible.builtin.include_role:
+        name: fonts
+        apply:
+          tags: [fonts]
+      tags: [never, fonts]
 
+    - name: deps | fzf
+      ansible.builtin.include_role:
+        name: fzf
+        apply:
+          tags: [fzf]
+      tags: [never, fzf]
+
+    - name: deps | powerline
+      ansible.builtin.include_role:
+        name: powerline
+        apply:
+          tags: [powerline]
+      tags: [never, powerline]
+
+    - name: deps | tree-sitter
+      ansible.builtin.include_role:
+        name: tree-sitter
+        apply:
+          tags: [tree-sitter]
+      tags: [never, tree-sitter]
+
+  roles:
     # ── main components ──────────────────────────────────────────────────────
     # Dependency edges (handled via include_role in each role's tasks):
     #   git   → fonts

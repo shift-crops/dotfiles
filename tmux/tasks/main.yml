@@ -6,6 +6,7 @@
 - name: tmux | ensure powerline (required by status bar)
   ansible.builtin.include_role:
     name: powerline
+    allow_duplicates: false
     apply:
       tags: [tmux, powerline]
   tags: [tmux]
@@ -13,6 +14,7 @@
 - name: tmux | ensure Nerd Fonts (required by powerline symbols)
   ansible.builtin.include_role:
     name: fonts
+    allow_duplicates: false
     apply:
       tags: [tmux, fonts]
   tags: [tmux]

@@ -10,7 +10,7 @@ Targets **Ubuntu 22.04+**.
 
 | Tag | What gets installed |
 |-----|---------------------|
-| `git` | git, [delta](https://github.com/dandavison/delta) (diff pager), [lazygit](https://github.com/jesseduffield/lazygit) (built from source with a custom pin patch) |
+| `git` | git, [delta](https://github.com/dandavison/delta) (diff pager), [lazygit](https://github.com/jesseduffield/lazygit) |
 | `nvim` | [Neovim](https://neovim.io/) ≥ 0.10 via PPA → AppImage fallback |
 | `tmux` | tmux, [TPM](https://github.com/tmux-plugins/tpm) |
 | `vim` | vim-gtk3, [dein.vim](https://github.com/Shougo/dein.vim) |
@@ -98,15 +98,15 @@ dotfiles/
 ├── inventory           # localhost (ansible_connection=local)
 ├── group_vars/
 │   └── all.yml         # XDG paths, minimum versions, cargo_bin
-├── toolchains/         # shared role — Go and Rust toolchains
+├── toolchains/         # shared role — Go, Rust and Node toolchains
 │   └── tasks/
 │       ├── go.yml
-│       └── rust.yml
+│       ├── rust.yml
+│       └── node.yml
 ├── git/                # role: git + delta + lazygit
 │   ├── tasks/main.yml
-│   ├── configs/        # symlinked to ~/.config/git/
-│   │   └── lazygit/    # symlinked to ~/.config/lazygit/
-│   └── lazygit_pin.patch
+│   └── configs/        # symlinked to ~/.config/git/
+│       └── lazygit/    # symlinked to ~/.config/lazygit/
 ├── nvim/               # role: neovim
 │   ├── tasks/main.yml
 │   └── configs/        # symlinked to ~/.config/nvim/
@@ -125,7 +125,8 @@ dotfiles/
 └── deps/
     ├── fonts/          # role: Hack Nerd Font
     ├── fzf/            # role: fzf + bat + tree + ripgrep
-    └── powerline/      # role: powerline
+    ├── powerline/      # role: powerline
+    └── tree-sitter/    # role: tree-sitter
 ```
 
 Config files under each `configs/` directory are **automatically symlinked** — no manual listing required.

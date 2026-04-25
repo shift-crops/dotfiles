@@ -4,6 +4,7 @@
 - name: yazi | ensure Nerd Fonts (required by file icons)
   ansible.builtin.include_role:
     name: fonts
+    allow_duplicates: false
     apply:
       tags: [yazi, fonts]
   tags: [yazi]
@@ -59,6 +60,7 @@
           ansible.builtin.include_role:
             name: toolchains
             tasks_from: rust
+            allow_duplicates: false
 
         - name: yazi | cargo install --force yazi-build
           ansible.builtin.shell: |
