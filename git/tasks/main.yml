@@ -94,10 +94,27 @@
             dest: /tmp/git-delta.deb
             mode: "0644"
 
-        - name: delta | install .deb
-          become: true
-          ansible.builtin.apt:
-            deb: /tmp/git-delta.deb
+        # ── step 4: install .deb — with cargo fallback ────────────────────────
+        - name: delta | install .deb — with cargo fallback
+          block:
+            - name: delta | install .deb via apt
+              become: true
+              ansible.builtin.apt:
+                deb: /tmp/git-delta.deb
+          rescue:
+            - name: delta | .deb install failed — ensure Rust toolchain
+              ansible.builtin.include_role:
+                name: toolchains
+                tasks_from: rust
+
+            - name: delta | cargo install git-delta
+              ansible.builtin.shell: |
+                set -o pipefail
+                cargo install git-delta 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+              args:
+                executable: /bin/bash
+              environment:
+                PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
 
         - name: delta | remove downloaded .deb
           ansible.builtin.file:

@@ -19,18 +19,20 @@
       tags: always
 
   roles:
-    # ── others/ (installable standalone via -t fonts / -t fzf / -t powerline) ──
+    # ── deps/ (installable standalone via -t <tag>) ──────────────────────────
     - role: fonts
       tags: [fonts]
     - role: fzf
       tags: [fzf]
     - role: powerline
       tags: [powerline]
+    - role: tree-sitter
+      tags: [tree-sitter]
 
     # ── main components ──────────────────────────────────────────────────────
     # Dependency edges (handled via include_role in each role's tasks):
     #   git   → fonts
-    #   nvim  → powerline, fonts
+    #   nvim  → powerline, fonts, tree-sitter
     #   tmux  → powerline, fonts
     #   vim   → powerline
     #   yazi  → fonts

@@ -1,0 +1,50 @@
+---
+# ── tree-sitter-cli ──────────────────────────────────────────────────────────
+# Installation priority:
+#   [4] npm install -g   — requires node toolchain
+#   [5] cargo install    — fallback when npm fails; requires rust toolchain
+
+- name: tree-sitter | check if already installed
+  ansible.builtin.shell: |
+    . "$NVM_DIR/nvm.sh" 2>/dev/null || true
+    command -v tree-sitter
+  args:
+    executable: /bin/bash
+  register: _ts_check
+  changed_when: false
+  failed_when: false
+  environment:
+    NVM_DIR: "{{ xdg_config_home }}/nvm"
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: tree-sitter | npm install -g with cargo fallback
+  when: _ts_check.rc != 0
+  block:
+    - name: tree-sitter | ensure node toolchain
+      ansible.builtin.include_role:
+        name: toolchains
+        tasks_from: node
+
+    - name: tree-sitter | install via npm
+      ansible.builtin.shell: |
+        set -o pipefail
+        . "$NVM_DIR/nvm.sh" 2>/dev/null || true
+        npm install -g tree-sitter-cli 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+      args:
+        executable: /bin/bash
+      environment:
+        NVM_DIR: "{{ xdg_config_home }}/nvm"
+  rescue:
+    - name: tree-sitter | npm failed — ensure Rust toolchain
+      ansible.builtin.include_role:
+        name: toolchains
+        tasks_from: rust
+
+    - name: tree-sitter | install via cargo
+      ansible.builtin.shell: |
+        set -o pipefail
+        cargo install tree-sitter-cli 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+      args:
+        executable: /bin/bash
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"

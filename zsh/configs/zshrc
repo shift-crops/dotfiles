@@ -73,11 +73,11 @@ function zle-line-finish {
 }
 zle -N zle-line-finish
 
-path+=($(systemd-path user-binaries))
+path=($(systemd-path user-binaries) $path)
 EDITOR=nvim
 
-[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
-[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf
+[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf ]  && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.fzf
 [ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.tmux ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.tmux
 [ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.yazi ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.yazi
+[ -s "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.nvm ]  && source "${XDG_CONFIG_HOME:-$HOME/.config}"/zsh/.zshrc.nvm
 [ -s ~/.zshrc.local ] && source ~/.zshrc.local

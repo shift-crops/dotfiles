@@ -1,16 +1,4 @@
 ---
-# ── fzf dependencies ─────────────────────────────────────────────────────────
-# Install method: [1] apt
-
-- name: fzf | install apt dependencies (bat, tree, ripgrep)
-  become: true
-  ansible.builtin.apt:
-    name:
-      - bat
-      - tree
-      - ripgrep
-    state: present
-
 # ── fzf ─────────────────────────────────────────────────────────────────────
 # Installation priority:
 #   [1] Default apt    — used if candidate version ≥ min_versions.fzf
@@ -48,7 +36,6 @@
       when: _apt_fzf_ver.stdout is version(min_versions.fzf, '>=')
 
     # ── step 3: git clone + official installer ────────────────────────────────
-    # --xdg places shell integration scripts under $XDG_CONFIG_HOME/fzf/,
     # which is the path expected by zshrc.fzf.
     - name: fzf | install from git
       when: _apt_fzf_ver.stdout is version(min_versions.fzf, '<')
@@ -64,6 +51,67 @@
           ansible.builtin.command:
             cmd: >
               {{ fzf_data_dir }}/install
-              --xdg --no-bash --no-fish
+              --bin --no-bash --no-fish
               --key-bindings --completion --no-update-rc
             creates: "{{ fzf_data_dir }}/bin/fzf"
+
+        - name: fzf | symlink binary to local bin
+          ansible.builtin.file:
+            src: "{{ fzf_data_dir }}/bin/{{ item }}"
+            dest: "{{ local_bin }}/{{ item }}"
+            state: link
+          loop:
+            - fzf
+            - fzf-tmux
+
+# ── fzf optional dependencies ────────────────────────────────────────────────
+# apt-cache show で各パッケージの有無を事前確認し、apt / cargo に振り分けて一括導入。
+# cargo package names: bat → bat, ripgrep → ripgrep, tree → tree-rs
+
+- name: fzf deps | classify bat, ripgrep, tree by install method
+  ansible.builtin.shell: |
+    apt_pkgs=()
+    cargo_pkgs=()
+    apt-cache show bat     >/dev/null 2>&1 && apt_pkgs+=(bat)     || cargo_pkgs+=(bat)
+    apt-cache show ripgrep >/dev/null 2>&1 && apt_pkgs+=(ripgrep) || cargo_pkgs+=(ripgrep)
+    apt-cache show tree    >/dev/null 2>&1 && apt_pkgs+=(tree)    || cargo_pkgs+=(tree-rs)
+    echo "${apt_pkgs[*]}|${cargo_pkgs[*]}"
+  args:
+    executable: /bin/bash
+  register: _fzfdep_classify
+  changed_when: false
+
+- name: fzf deps | set apt / cargo install lists
+  ansible.builtin.set_fact:
+    _fzfdep_apt:   "{{ _fzfdep_classify.stdout.split('|')[0].split() }}"
+    _fzfdep_cargo: "{{ _fzfdep_classify.stdout.split('|')[1].split() }}"
+
+- name: fzf deps | install available tools via apt
+  become: true
+  ansible.builtin.apt:
+    name: "{{ _fzfdep_apt }}"
+    state: present
+  when: _fzfdep_apt | length > 0
+
+- name: fzf deps | ensure Rust toolchain for cargo installs
+  ansible.builtin.include_role:
+    name: toolchains
+    tasks_from: rust
+  when: _fzfdep_cargo | length > 0
+
+- name: fzf deps | install unavailable tools via cargo
+  ansible.builtin.shell: |
+    set -o pipefail
+    cargo install {{ _fzfdep_cargo | join(' ') }} 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+  args:
+    executable: /bin/bash
+  when: _fzfdep_cargo | length > 0
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ cargo_bin }}"
+
+- name: fzf deps | bat — symlink as batcat when installed via cargo
+  ansible.builtin.file:
+    src: "{{ cargo_bin }}/bat"
+    dest: "{{ local_bin }}/batcat"
+    state: link
+  when: "'bat' in _fzfdep_cargo"

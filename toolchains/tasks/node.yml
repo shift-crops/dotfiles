@@ -1,0 +1,68 @@
+---
+# Node.js toolchain
+# Installation priority:
+#   [1] apt    — used if candidate version ≥ min_versions.node
+#   [4] nvm    — latest LTS via official nvm installer from GitHub
+
+- name: toolchains/node | check installed version
+  ansible.builtin.command: node --version
+  register: _node_ver_raw
+  changed_when: false
+  failed_when: false
+
+- name: toolchains/node | parse installed version
+  ansible.builtin.set_fact:
+    _node_ver: >-
+      {{ (_node_ver_raw.stdout | regex_search('v([0-9]+\.[0-9]+\.[0-9]+)', '\1') | first)
+         if _node_ver_raw.rc == 0 else '0.0.0' }}
+
+- name: toolchains/node | install
+  when: _node_ver is version(min_versions.node, '<')
+  block:
+    # ── step 1: check apt candidate ──────────────────────────────────────────
+    - name: toolchains/node | check apt candidate version
+      ansible.builtin.shell: |
+        ver=$(apt-cache policy nodejs 2>/dev/null | awk '/Candidate:/{print $2}')
+        { [ "$ver" = "(none)" ] || [ -z "$ver" ]; } && echo "0.0.0" || echo "$ver"
+      register: _apt_node_ver
+      changed_when: false
+
+    # ── step 2: install from apt if candidate satisfies minimum ──────────────
+    - name: toolchains/node | install nodejs via apt
+      become: true
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+      when: _apt_node_ver.stdout is version(min_versions.node, '>=')
+
+    # ── step 3: nvm — fetch latest tag, install nvm, then install LTS node ───
+    - name: toolchains/node | install via nvm
+      when: _apt_node_ver.stdout is version(min_versions.node, '<')
+      block:
+        - name: toolchains/node | fetch latest nvm release tag
+          ansible.builtin.uri:
+            url: https://api.github.com/repos/nvm-sh/nvm/releases/latest
+            headers:
+              Accept: application/vnd.github.v3+json
+          register: _nvm_release
+
+        - name: toolchains/node | run nvm installer
+          ansible.builtin.shell: |
+            set -o pipefail
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ _nvm_release.json.tag_name }}/install.sh \
+              | bash 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+          args:
+            executable: /bin/bash
+            creates: "{{ xdg_config_home }}/nvm/nvm.sh"
+          environment:
+            PROFILE: "/dev/null"
+
+        - name: toolchains/node | install latest LTS node via nvm
+          ansible.builtin.shell: |
+            set -o pipefail
+            . "$NVM_DIR/nvm.sh"
+            nvm install --lts 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+          args:
+            executable: /bin/bash
+          environment:
+            NVM_DIR: "{{ xdg_config_home }}/nvm"

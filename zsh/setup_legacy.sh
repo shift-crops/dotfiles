@@ -12,6 +12,7 @@ fi
 for FILE in configs/zshrc*; do
 	[[ ! -s "$ZDOTDIR/.$FILE" ]] && ln -is "$PWD/$FILE" "$ZDOTDIR/.$(basename $FILE)"
 done
+[[ ! -s "$HOME/.zshenv" ]] && ln -is "$PWD/configs/.zshenv" "$HOME/.zshenv"
 
 if [ ! -d "$ZDOTDIR/.zprezto" ]; then
     git clone --recursive https://github.com/sorin-ionescu/prezto.git "$ZDOTDIR/.zprezto"

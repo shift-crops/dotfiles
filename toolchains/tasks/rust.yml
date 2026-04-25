@@ -1,11 +1,31 @@
 ---
-# Rust toolchain via rustup — install method: [1] apt (Ubuntu 22.04+)
+# Rust toolchain via rustup
+# Installation priority:
+#   [1] apt    — rustup package (Ubuntu 22.04+)
+#   [5] curl   — official rustup installer (fallback when apt fails)
 
-- name: toolchains/rust | install rustup via apt
-  become: true
-  ansible.builtin.apt:
-    name: rustup
-    state: present
+- name: toolchains/rust | install rustup — apt with curl fallback
+  block:
+    - name: toolchains/rust | install rustup via apt
+      become: true
+      ansible.builtin.apt:
+        name: rustup
+        state: present
+  rescue:
+    - name: toolchains/rust | apt failed — install build-essential
+      become: true
+      ansible.builtin.apt:
+        name: build-essential
+        state: present
+
+    - name: toolchains/rust | install rustup via curl installer
+      ansible.builtin.shell: |
+        set -o pipefail
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+          | sh -s -- -y 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+      args:
+        executable: /bin/bash
+        creates: "{{ cargo_bin }}/rustup"
 
 - name: toolchains/rust | set stable toolchain as default
   ansible.builtin.command: rustup default stable

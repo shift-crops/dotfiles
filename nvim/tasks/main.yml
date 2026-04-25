@@ -15,6 +15,13 @@
       tags: [nvim, neovim, fonts]
   tags: [nvim, neovim]
 
+- name: nvim | ensure tree-sitter (required by nvim-treesitter)
+  ansible.builtin.include_role:
+    name: tree-sitter
+    apply:
+      tags: [nvim, neovim, tree-sitter]
+  tags: [nvim, neovim]
+
 # ── neovim ──────────────────────────────────────────────────────────────────
 # Installation priority:
 #   [1] Default apt    — used if candidate version ≥ min_versions.neovim

@@ -94,7 +94,7 @@ Usage: install.sh [OPTIONS]
 dotfiles/
 ├── install.sh          # entry point
 ├── site.yml            # Ansible playbook
-├── ansible.cfg         # roles_path = .:others
+├── ansible.cfg         # roles_path = .:deps
 ├── inventory           # localhost (ansible_connection=local)
 ├── group_vars/
 │   └── all.yml         # XDG paths, minimum versions, cargo_bin
@@ -122,7 +122,7 @@ dotfiles/
 ├── zsh/                # role: zsh + prezto
 │   ├── tasks/main.yml
 │   └── configs/        # .zshenv → $HOME; others → $ZDOTDIR with leading dot
-└── others/
+└── deps/
     ├── fonts/          # role: Hack Nerd Font
     ├── fzf/            # role: fzf + bat + tree + ripgrep
     └── powerline/      # role: powerline
