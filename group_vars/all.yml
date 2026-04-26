@@ -8,6 +8,7 @@ xdg_data_home: "{{ lookup('env', 'XDG_DATA_HOME') or (ansible_env.HOME + '/.loca
 xdg_cache_home: "{{ lookup('env', 'XDG_CACHE_HOME') or (ansible_env.HOME + '/.cache') }}"
 local_bin:  "{{ ansible_env.HOME }}/.local/bin"
 cargo_bin:  "{{ ansible_env.HOME }}/.cargo/bin"
+nvm_dir:    "{{ xdg_data_home }}/nvm"
 
 # Minimum required versions.
 # The comment after each entry shows which install method was chosen and why.

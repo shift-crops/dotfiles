@@ -38,6 +38,8 @@
     # ── step 3: nvm — fetch latest tag, install nvm, then install LTS node ───
     - name: toolchains/node | install via nvm
       when: _apt_node_ver.stdout is version(min_versions.node, '<')
+      environment:
+        NVM_DIR: "{{ nvm_dir }}"
       block:
         - name: toolchains/node | fetch latest nvm release tag
           ansible.builtin.uri:
@@ -48,22 +50,15 @@
 
         - name: toolchains/node | run nvm installer
           ansible.builtin.shell: |
-            set -o pipefail
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ _nvm_release.json.tag_name }}/install.sh \
-              | bash 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ _nvm_release.json.tag_name }}/install.sh | bash
           args:
-            executable: /bin/bash
-            creates: "{{ xdg_config_home }}/nvm/nvm.sh"
+            creates: "{{ nvm_dir }}/nvm.sh"
           environment:
-            XDG_CONFIG_HOME: "{{ xdg_config_home }}"
+            XDG_CONFIG_HOME: "{{ xdg_data_home }}"
             PROFILE: "/dev/null"
 
         - name: toolchains/node | install latest LTS node via nvm
           ansible.builtin.shell: |
-            set -o pipefail
             . "$NVM_DIR/nvm.sh"
-            nvm install --lts 2>&1 | { tee /dev/tty 2>/dev/null || cat; }
-          args:
-            executable: /bin/bash
-          environment:
-            NVM_DIR: "{{ xdg_config_home }}/nvm"
+            nvm install --lts
+            npm config --cache {{ npm_cache }} set cache {{ npm_cache }}

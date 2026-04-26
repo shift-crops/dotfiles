@@ -17,5 +17,5 @@
 
 - name: toolchains/go | set GOPATH under XDG_DATA_HOME
   ansible.builtin.command:
-    cmd: go env -w GOPATH={{ xdg_data_home }}/go
-  when: _go_env_gopath.stdout != xdg_data_home + '/go'
+    cmd: go env -w GOPATH={{ gopath }}
+  when: _go_env_gopath.stdout != gopath

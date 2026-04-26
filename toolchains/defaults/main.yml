@@ -1,2 +1,3 @@
 ---
-cargo_bin: "{{ ansible_env.HOME }}/.cargo/bin"
+gopath: "{{ xdg_data_home }}/go"
+npm_cache: "{{ xdg_cache_home }}/npm"
